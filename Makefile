@@ -7,7 +7,7 @@ OBJDIR = obj
 BINDIR = output
 SOURCES := $(shell find $(SRCDIR) -name '*.c')
 OBJECTS := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
-TARGET := $(BINDIR)/build
+TARGET := $(BINDIR)/bouncyerror
 
 all: $(TARGET)
 

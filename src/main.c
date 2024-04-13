@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <shellapi.h>
 
 #define IDT_TIMER1 0
 #define IDC_STATIC_TEXT 1
@@ -21,7 +22,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
   {
     // Create the static text control
     CreateWindowEx(0, "STATIC", "Task failed successfully.", WS_CHILD | WS_VISIBLE | SS_CENTER, 30, 40, 300, 30, hwnd, (HMENU)IDC_STATIC_TEXT, NULL, NULL);
-    
+
     // Create the static icon control
     HICON hInfoIcon = LoadIcon(NULL, IDI_INFORMATION);
     CreateWindowEx(0, "STATIC", NULL, WS_CHILD | WS_VISIBLE | SS_ICON, 40, 30, 30, 30, hwnd, (HMENU)IDC_STATIC_ICON, NULL, NULL);
@@ -70,6 +71,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 {
   const char CLASS_NAME[] = "FunnyErrorWindow";
 
+  // Parse command line arguments
+  int argc;
+  LPWSTR *argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+  if (argv)
+  {
+    for (int i = 0; i < argc; i++)
+    {
+      if (wcscmp(argv[i], L"--speed") == 0 && i + 1 < argc)
+      {
+        dx = dy = _wtoi(argv[i + 1]);
+      }
+    }
+    LocalFree(argv);
+  }
+
   WNDCLASS wc = {};
 
   wc.lpfnWndProc = WndProc;
@@ -81,7 +97,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
   HWND hwnd = CreateWindowEx(0, CLASS_NAME, "Error", WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 175, NULL, NULL, hInstance, NULL);
 
-  if (hwnd == NULL) 
+  if (hwnd == NULL)
   {
     return 0;
   }
