@@ -2,6 +2,7 @@
 #include <shellapi.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 
 #define IDT_TIMER1 0
 #define IDC_STATIC_TEXT 1
@@ -9,17 +10,26 @@
 #define IDC_OK_BUTTON 3
 
 int dx = 5, dy = 5;
+bool funMode = false;
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+  static HBRUSH hBrush = NULL;
+
   switch (msg)
   {
   case WM_CLOSE:
     DestroyWindow(hwnd);
     break;
   case WM_DESTROY:
+  {
+    if (hBrush != NULL)
+    {
+      DeleteObject(hBrush);
+    }
     PostQuitMessage(0);
-    break;
+  }
+  break;
   case WM_CREATE:
   {
     // Create the static text control
@@ -42,6 +52,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
   }
   break;
+  case WM_CTLCOLORSTATIC:
+  {
+    if (funMode && hBrush != NULL)
+    {
+      HDC hdcStatic = (HDC)wParam;
+      SetBkMode(hdcStatic, TRANSPARENT);
+      return (INT_PTR)hBrush;
+    }
+  }
+  break;
   case WM_TIMER:
   {
     RECT rect;
@@ -56,9 +76,33 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     RECT desktopRect = mi.rcWork;
 
     if (rect.left + dx < desktopRect.left || rect.right + dx > desktopRect.right)
+    {
       dx = -dx;
+      if (funMode)
+      {
+        if (hBrush != NULL)
+        {
+          DeleteObject(hBrush);
+        }
+        hBrush = CreateSolidBrush(RGB(rand() % 256, rand() % 256, rand() % 256));
+        SetClassLongPtr(hwnd, GCLP_HBRBACKGROUND, (LONG)hBrush);
+        InvalidateRect(hwnd, NULL, TRUE);
+      }
+    }
     if (rect.top + dy < desktopRect.top || rect.bottom + dy > desktopRect.bottom)
+    {
       dy = -dy;
+      if (funMode)
+      {
+        if (hBrush != NULL)
+        {
+          DeleteObject(hBrush);
+        }
+        hBrush = CreateSolidBrush(RGB(rand() % 256, rand() % 256, rand() % 256));
+        SetClassLongPtr(hwnd, GCLP_HBRBACKGROUND, (LONG)hBrush);
+        InvalidateRect(hwnd, NULL, TRUE);
+      }
+    }
 
     SetWindowPos(hwnd, HWND_TOP, rect.left + dx, rect.top + dy, width, height, SWP_SHOWWINDOW);
   }
@@ -85,7 +129,7 @@ DWORD WINAPI MoveWindowThread(LPVOID lpParam)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
   const char CLASS_NAME[] = "FunnyErrorWindow";
-  
+
   int speed = 5;
 
   // Parse command line arguments
@@ -98,6 +142,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
       if (wcscmp(argv[i], L"--speed") == 0 && i + 1 < argc)
       {
         speed = _wtoi(argv[i + 1]);
+      }
+      else if (wcscmp(argv[i], L"--fun") == 0)
+      {
+        funMode = true;
       }
     }
     LocalFree(argv);
