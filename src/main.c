@@ -1,5 +1,7 @@
 #include <windows.h>
 #include <shellapi.h>
+#include <stdlib.h>
+#include <time.h>
 
 #define IDT_TIMER1 0
 #define IDC_STATIC_TEXT 1
@@ -67,9 +69,24 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
   return 0;
 }
 
+DWORD WINAPI MoveWindowThread(LPVOID lpParam)
+{
+  HWND hwnd = (HWND)lpParam;
+
+  while (1)
+  {
+    PostMessage(hwnd, WM_TIMER, 0, 0);
+    Sleep(10);
+  }
+
+  return 0;
+}
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
   const char CLASS_NAME[] = "FunnyErrorWindow";
+  
+  int speed = 5;
 
   // Parse command line arguments
   int argc;
@@ -80,7 +97,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     {
       if (wcscmp(argv[i], L"--speed") == 0 && i + 1 < argc)
       {
-        dx = dy = _wtoi(argv[i + 1]);
+        speed = _wtoi(argv[i + 1]);
       }
     }
     LocalFree(argv);
@@ -95,7 +112,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
   RegisterClass(&wc);
 
-  HWND hwnd = CreateWindowEx(0, CLASS_NAME, "Error", WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 175, NULL, NULL, hInstance, NULL);
+  srand(time(NULL));
+  RECT workArea;
+  SystemParametersInfo(SPI_GETWORKAREA, 0, &workArea, 0);
+
+  int screenWidth = workArea.right - workArea.left - 300;
+  int screenHeight = workArea.bottom - workArea.top - 175;
+
+  int startX = workArea.left + rand() % screenWidth;
+  int startY = workArea.top + rand() % screenHeight;
+
+  dx = (rand() % 2 == 0) ? speed : -speed;
+  dy = (rand() % 2 == 0) ? speed : -speed;
+
+  HWND hwnd = CreateWindowEx(0, CLASS_NAME, "Error", WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, startX, startY, 300, 175, NULL, NULL, hInstance, NULL);
 
   if (hwnd == NULL)
   {
@@ -105,7 +135,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
   ShowWindow(hwnd, nCmdShow);
   UpdateWindow(hwnd);
 
-  SetTimer(hwnd, IDT_TIMER1, 10, (TIMERPROC)NULL);
+  CreateThread(NULL, 0, MoveWindowThread, hwnd, 0, NULL);
 
   MSG msg = {};
   while (GetMessage(&msg, NULL, 0, 0))
