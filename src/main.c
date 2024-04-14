@@ -27,6 +27,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
       DeleteObject(hBrush);
     }
+
+    KillTimer(hwnd, IDT_TIMER1);
+
     PostQuitMessage(0);
   }
   break;
@@ -42,6 +45,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
     // Create the OK button
     CreateWindowEx(0, "BUTTON", "OK", WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON, 100, 95, 100, 30, hwnd, (HMENU)IDC_OK_BUTTON, NULL, NULL);
+
+    SetTimer(hwnd, IDT_TIMER1, 10, NULL);
   }
   break;
   case WM_COMMAND:
@@ -54,12 +59,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
   break;
   case WM_CTLCOLORSTATIC:
   {
-    if (funMode && hBrush != NULL)
-    {
-      HDC hdcStatic = (HDC)wParam;
-      SetBkMode(hdcStatic, TRANSPARENT);
-      return (INT_PTR)hBrush;
-    }
+    HDC hdcStatic = (HDC)wParam;
+    SetBkMode(hdcStatic, TRANSPARENT);
+    if (funMode)
+      return (LRESULT)GetStockObject(NULL_BRUSH);
+    else
+      return (LRESULT)GetStockObject(WHITE_BRUSH);
   }
   break;
   case WM_TIMER:
@@ -110,20 +115,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
   default:
     return DefWindowProc(hwnd, msg, wParam, lParam);
   }
-  return 0;
-}
-
-DWORD WINAPI MoveWindowThread(LPVOID lpParam)
-{
-  HWND hwnd = (HWND)lpParam;
-
-  while (1)
-  {
-    PostMessage(hwnd, WM_TIMER, 0, 0);
-    Sleep(10);
-  }
-
-  return 0;
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -173,7 +164,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
   dx = (rand() % 2 == 0) ? speed : -speed;
   dy = (rand() % 2 == 0) ? speed : -speed;
 
-  HWND hwnd = CreateWindowEx(0, CLASS_NAME, "Error", WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, startX, startY, 300, 175, NULL, NULL, hInstance, NULL);
+  HWND hwnd = CreateWindowEx(0, CLASS_NAME, "Error", WS_CAPTION | WS_SYSMENU, startX, startY, 300, 175, NULL, NULL, hInstance, NULL);
 
   if (hwnd == NULL)
   {
@@ -182,8 +173,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
   ShowWindow(hwnd, nCmdShow);
   UpdateWindow(hwnd);
-
-  CreateThread(NULL, 0, MoveWindowThread, hwnd, 0, NULL);
 
   MSG msg = {};
   while (GetMessage(&msg, NULL, 0, 0))
