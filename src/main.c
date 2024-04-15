@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #define IDT_TIMER1 0
 #define IDC_STATIC_TEXT 1
@@ -11,6 +12,7 @@
 
 int dx = 5, dy = 5;
 bool funMode = false;
+char textString[] = "Task failed successfully.";
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -36,7 +38,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
   case WM_CREATE:
   {
     // Create the static text control
-    CreateWindowEx(0, "STATIC", "Task failed successfully.", WS_CHILD | WS_VISIBLE | SS_CENTER, 30, 40, 300, 30, hwnd, (HMENU)IDC_STATIC_TEXT, NULL, NULL);
+    CreateWindowEx(0, "STATIC", textString, WS_CHILD | WS_VISIBLE | SS_CENTER, 30, 40, 300, 30, hwnd, (HMENU)IDC_STATIC_TEXT, NULL, NULL);
 
     // Create the static icon control
     HICON hInfoIcon = LoadIcon(NULL, IDI_INFORMATION);
@@ -137,6 +139,41 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
       else if (wcscmp(argv[i], L"--fun") == 0)
       {
         funMode = true;
+      }
+      else if (wcscmp(argv[i], L"--msg") == 0)
+      {
+        textString[0] = '\0';
+        for (int j = i + 1; j < argc; j++)
+        {
+          char temp[256];
+          wcstombs(temp, argv[j], sizeof(temp));
+
+          for (int k = 0; temp[k] != '\0'; k++)
+          {
+            if (temp[k] == '\\' && temp[k + 1] == 'n')
+            {
+              if (k > 0 && temp[k - 1] == ' ')
+              {
+                memmove(&temp[k - 1], &temp[k], strlen(temp) - k);
+              }
+
+              temp[k] = '\n';
+              memmove(&temp[k + 1], &temp[k + 2], strlen(temp) - k - 1);
+            }
+          }
+
+          strcat(textString, temp);
+          if (j < argc - 1)
+          {
+            strcat(textString, " ");
+          }
+        }
+        break;
+      } else if (wcscmp(argv[i], L"--help") == 0){
+        char message[1024];
+        sprintf(message, "Usage: %s [--speed <speed>] [--fun] [--msg <message>]\nOptions:\n  --speed <speed>  Set the speed of the window\n  --fun            Enable fun mode\n  --msg <message>  Set the message of the window\n", argv[0]);
+        MessageBox(NULL, message, "Help", MB_OK);
+        return 0;
       }
     }
     LocalFree(argv);

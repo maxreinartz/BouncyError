@@ -6,10 +6,12 @@ This only works on Windows (because it's the best OS)
 
 ## Args
 
-| Argument | Description                                                             | Takes Args | Default |  
-| -------- | ----------------------------------------------------------------------- | ---------- | ------- |  
-| --speed  | Sets the speed at which the error window bounces around the screen.     | Yes (1)    | 5       |  
-| --fun    | Enables fun mode, which changes the window's color when it hits a wall. | No         | -       |
+| Argument | Description                                                             | Takes Args | Default                   |  
+| -------- | ----------------------------------------------------------------------- | ---------- | ------------------------- |  
+| --speed  | Sets the speed at which the error window bounces around the screen.     | Yes (1)    | 5                         |  
+| --fun    | Enables fun mode, which changes the window's color when it hits a wall. | No         | -                         |
+| --msg    | Sets a custom "error" message                                           | Yes (1)    | Task failed successfully. |
+| --help   | Displays help                                                           | No         | -                         |
 
 ## License
 
