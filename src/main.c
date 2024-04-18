@@ -169,7 +169,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
           }
         }
         break;
-      } else if (wcscmp(argv[i], L"--help") == 0){
+      }
+      else if (wcscmp(argv[i], L"--help") == 0)
+      {
         char message[1024];
         sprintf(message, "Usage: %s [--speed <speed>] [--fun] [--msg <message>]\nOptions:\n  --speed <speed>  Set the speed of the window\n  --fun            Enable fun mode\n  --msg <message>  Set the message of the window\n", argv[0]);
         MessageBox(NULL, message, "Help", MB_OK);
