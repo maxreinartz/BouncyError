@@ -10,6 +10,7 @@
 #define IDC_STATIC_TEXT 1
 #define IDC_STATIC_ICON 2
 #define IDC_OK_BUTTON 3
+#define VERSION "1.51 (BUGFIX)"
 
 int dx = 5, dy = 5;
 bool funMode = false;
@@ -171,7 +172,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
       }
       else if (wcscmp(argv[i], L"--version") == 0)
       {
-        MessageBox(NULL, "BouncyError v1.5", "Version", MB_OK);
+        char message[256];
+        sprintf(message, "BouncyError v%s", VERSION);
+        MessageBox(NULL, message, "Version", MB_OK);
         return 0;
       }
       else if (wcscmp(argv[i], L"--license") == 0)
@@ -222,7 +225,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
           {
             const char *translation = getTranslation(userLang);
             if (translation != NULL)
-            {                               
+            {
               wchar_t wideTranslation[256];
               MultiByteToWideChar(CP_UTF8, 0, translation, -1, wideTranslation, sizeof(wideTranslation) / sizeof(wideTranslation[0]));
               wcscpy(textString, wideTranslation);
@@ -249,7 +252,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
       else if (wcscmp(argv[i], L"--help") == 0)
       {
         char message[1024];
-        sprintf(message, "Usage: %s [--speed <speed>] [--fun] [--msg <message>]\nOptions:\n  --speed <speed>  Set the speed of the window\n  --fun            Enable fun mode\n  --msg <message>  Set the message of the window\n", argv[0]);
+        sprintf(message, "Usage: [--speed <speed>] [--fun] [--msg <message>] [--version] [--license] [--author] [--lang <language_code>] [--help]\n"
+                         "Options:\n"
+                         "  --speed <speed>        Set the speed of the window\n"
+                         "  --fun                  Enable fun mode\n"
+                         "  --msg <message>        Set the message of the window\n"
+                         "  --version              Display the version information\n"
+                         "  --license              Display the license information\n"
+                         "  --author               Display the author information\n"
+                         "  --lang <language_code> Set the language for the message\n"
+                         "  --help                 Display this help message\n");
         MessageBox(NULL, message, "Help", MB_OK);
         return 0;
       }
