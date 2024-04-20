@@ -4,6 +4,7 @@
 #include <time.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include "lang.h"
 
 #define IDT_TIMER1 0
 #define IDC_STATIC_TEXT 1
@@ -12,7 +13,7 @@
 
 int dx = 5, dy = 5;
 bool funMode = false;
-char textString[] = "Task failed successfully.";
+wchar_t textString[] = L"Task failed successfully.";
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -37,15 +38,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
   break;
   case WM_CREATE:
   {
-    // Create the static text control
-    CreateWindowEx(0, "STATIC", textString, WS_CHILD | WS_VISIBLE | SS_CENTER, 30, 40, 300, 30, hwnd, (HMENU)IDC_STATIC_TEXT, NULL, NULL);
+    CreateWindowExW(0, L"STATIC", textString, WS_CHILD | WS_VISIBLE | SS_CENTER, 30, 40, 300, 30, hwnd, (HMENU)IDC_STATIC_TEXT, NULL, NULL);
 
-    // Create the static icon control
     HICON hInfoIcon = LoadIcon(NULL, IDI_INFORMATION);
     CreateWindowEx(0, "STATIC", NULL, WS_CHILD | WS_VISIBLE | SS_ICON, 40, 30, 30, 30, hwnd, (HMENU)IDC_STATIC_ICON, NULL, NULL);
     SendMessage(GetDlgItem(hwnd, IDC_STATIC_ICON), STM_SETICON, (WPARAM)hInfoIcon, 0);
 
-    // Create the OK button
     CreateWindowEx(0, "BUTTON", "OK", WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON, 100, 95, 100, 30, hwnd, (HMENU)IDC_OK_BUTTON, NULL, NULL);
 
     SetTimer(hwnd, IDT_TIMER1, 10, NULL);
@@ -125,7 +123,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
   int speed = 5;
 
-  // Parse command line arguments
   int argc;
   LPWSTR *argv = CommandLineToArgvW(GetCommandLineW(), &argc);
   if (argv)
@@ -162,13 +159,92 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             }
           }
 
-          strcat(textString, temp);
+          wchar_t wideTemp[256];
+          MultiByteToWideChar(CP_UTF8, 0, temp, -1, wideTemp, 256);
+          wcscat(textString, wideTemp);
           if (j < argc - 1)
           {
-            strcat(textString, " ");
+            wcscat(textString, L" ");
           }
         }
         break;
+      }
+      else if (wcscmp(argv[i], L"--version") == 0)
+      {
+        MessageBox(NULL, "BouncyError v1.5", "Version", MB_OK);
+        return 0;
+      }
+      else if (wcscmp(argv[i], L"--license") == 0)
+      {
+        char message[2048];
+        sprintf(message, "Creeper76's Software License\n\nCopyright (c) 2024 Creeper76\n\n"
+                         "Permission is hereby granted, free of charge, to any person obtaining a copy\n"
+                         "of this software and associated documentation files (the \"Software\"), to deal\n"
+                         "in the Software without restriction, including without limitation the rights\n"
+                         "to use, copy, modify, and distribute the Software for any non-commercial purpose,\n"
+                         "subject to the following conditions:\n\n"
+                         "You may:\n"
+                         "- Use the Software for any non-commercial purpose, where non-commercial purpose means any activity\n"
+                         "  or transaction done without an intention to make a profit.\n"
+                         "- Copy the Software for your own use or backup.\n"
+                         "- Modify the Software to suit your needs or preferences.\n"
+                         "- Distribute the Software to others, as long as you comply with the terms of this license.\n\n"
+                         "You may not:\n"
+                         "- Use the Software for any commercial purpose, where commercial purpose means any activity or\n"
+                         "  transaction done with an intention to make a profit.\n"
+                         "- Use the Software for any illegal or harmful activities.\n"
+                         "- Distribute the Software with a hidden or obfuscated source code.\n"
+                         "- Distribute the Software with a modified or changed license.\n"
+                         "- Distribute the Software with a charge for the source code.\n\n"
+                         "This software is provided \"as is\", without warranty of any kind, express or implied. The author(s)\n"
+                         "of the software are not liable for any damages or losses arising from the use of the software.");
+        MessageBox(NULL, message, "License", MB_OK);
+        return 0;
+      }
+      else if (wcscmp(argv[i], L"--author") == 0)
+      {
+        MessageBox(NULL, "Creeper76", "Author", MB_OK);
+        return 0;
+      }
+      else if (wcscmp(argv[i], L"--lang") == 0)
+      {
+        if (i + 1 < argc)
+        {
+          char userLang[256];
+          wcstombs(userLang, argv[i + 1], sizeof(userLang));
+          userLang[sizeof(userLang) - 1] = '\0';
+
+          // MessageBoxA(NULL, userLang, "DEBUG", MB_OK);
+
+          initializeLanguage();
+
+          if (isLangCodeValid(userLang) == 0)
+          {
+            const char *translation = getTranslation(userLang);
+            if (translation != NULL)
+            {                               
+              wchar_t wideTranslation[256];
+              MultiByteToWideChar(CP_UTF8, 0, translation, -1, wideTranslation, sizeof(wideTranslation) / sizeof(wideTranslation[0]));
+              wcscpy(textString, wideTranslation);
+            }
+            else
+            {
+              MessageBoxA(NULL, "Translation is missing.", "Error", MB_OK);
+            }
+          }
+          else
+          {
+            char message[256];
+            sprintf(message, "Invalid language code. Function returned %s", isLangCodeValid(userLang) == 1 ? "1" : "2");
+            MessageBoxA(NULL, message, "Error", MB_OK);
+            return 1;
+          }
+        }
+        else
+        {
+          MessageBoxA(NULL, "Language argument is missing.", "Error", MB_OK);
+          return 1;
+        }
       }
       else if (wcscmp(argv[i], L"--help") == 0)
       {
