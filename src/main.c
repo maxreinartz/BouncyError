@@ -206,7 +206,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
       }
       else if (wcscmp(argv[i], L"--author") == 0)
       {
-        MessageBox(NULL, "Creeper76", "Author", MB_OK);
+        MessageBox(NULL, "Max Reinartz", "Author", MB_OK);
         return 0;
       }
       else if (wcscmp(argv[i], L"--lang") == 0)
@@ -259,7 +259,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                          "  --msg <message>        Set the message of the window\n"
                          "  --version              Display the version information\n"
                          "  --license              Display the license information\n"
-                         "  --author               Display the author information\n"
+                         "  --author               Display the author\n"
                          "  --lang <language_code> Set the language for the message\n"
                          "  --help                 Display this help message\n");
         MessageBox(NULL, message, "Help", MB_OK);
