@@ -14,23 +14,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Install Chocolatey
-        run: |
-          Set-ExecutionPolicy Bypass -Scope Process -Force; `
-          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
-          iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+        uses: actions/checkout@v3
 
       - name: Install Make
         run: choco install make
 
       - name: Install GCC
         run: choco install mingw
-
-      - name: Add GCC to PATH
-        run: |
-          echo "::add-path::C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin"
 
       - name: Run build script
         run: .\build.bat
