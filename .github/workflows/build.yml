@@ -23,12 +23,16 @@ jobs:
         run: choco install mingw
 
       - name: Run build script
-        run: .\build.bat
+        run: |
+          ls
+          .\build.bat
+          ls
 
       - name: Archive bouncyerror
         run: |
           ls
           cd output
+          ls
           Compress-Archive -Path bouncyerror -DestinationPath "BouncyError.zip"
 
       - name: Upload ZIP
