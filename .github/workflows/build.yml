@@ -25,10 +25,10 @@ jobs:
       - name: Run build script
         run: .\build.bat
 
-      - name: Archive bounceyerror.exe
+      - name: Archive bouncyerror
         run: |
           cd output
-          Compress-Archive -Path bouncyerror.exe -DestinationPath "BouncyError.zip"
+          Compress-Archive -Path bouncyerror -DestinationPath "BouncyError.zip"
 
       - name: Upload ZIP
         uses: actions/upload-artifact@v4
