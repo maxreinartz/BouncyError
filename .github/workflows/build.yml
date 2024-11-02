@@ -22,9 +22,6 @@ jobs:
       - name: Install GCC
         run: choco install mingw
 
-      - name: Install mingw32-make
-        run: choco install mingw
-
       - name: Run build script
         run: |
           .\build.bat
