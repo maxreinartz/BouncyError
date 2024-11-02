@@ -16,16 +16,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up MSVC
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: x64
+      - name: Install Chocolatey
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force; `
+          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
+          iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+      - name: Install Make
+        run: choco install make
+
+      - name: Install GCC
+        run: choco install mingw
+
+      - name: Add GCC to PATH
+        run: |
+          echo "::add-path::C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin"
 
       - name: Run build script
-        run: build.bat
+        run: .\build.bat
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
-          path: ./output/* # Adjust the path to your build output directory
+          path: ./output/*
