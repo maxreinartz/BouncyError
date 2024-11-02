@@ -27,6 +27,7 @@ jobs:
 
       - name: Archive bouncyerror
         run: |
+          ls
           cd output
           Compress-Archive -Path bouncyerror -DestinationPath "BouncyError.zip"
 
