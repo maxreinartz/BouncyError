@@ -186,12 +186,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         char message[1024];
         sprintf(message, "Usage: [--speed <speed>] [--fun] [--msg <message>] [--version] [--license] [--author] [--lang <language_code>] [--help]\n"
                          "Options:\n"
+<<<<<<< HEAD
                          "  --speed <speed>         Set the speed of the window\n"
                          "  --rainbow               Enable Rainbow mode\n"
                          "  --msg <message>         Set the message of the window\n"
                          "  --version               Display the version information\n"
                          "  --author                Display the author\n"
                          "  --help                  Display this help message\n");
+=======
+                         "  --speed <speed>        Set the speed of the window\n"
+                         "  --fun                  Enable fun mode\n"
+                         "  --msg <message>        Set the message of the window\n"
+                         "  --version              Display the version information\n"
+                         "  --license              Display the license information\n"
+                         "  --author               Display the author\n"
+                         "  --lang <language_code> Set the language for the message\n"
+                         "  --help                 Display this help message\n");
+>>>>>>> e6511289111b1b855aa4a899af5089017b22693f
         MessageBox(NULL, message, "Help", MB_OK);
         return 0;
       }
