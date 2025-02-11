@@ -17,4 +17,4 @@ This only works on Windows (because it's the best OS)
 
 ## License
 
-This is licensed under Creeper76's Software License. Check the LICENSE file for more.
+This is licensed under Max Reinartz's Software License. Check the LICENSE file for more.
