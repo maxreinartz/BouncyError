@@ -1,8 +1,10 @@
 # BouncyError
 
-This is an error window that bounces around your screen.  
-Just open it and watch it bounce!  
-This only works on Windows (because it's the best OS)
+This is an error window that bounces around your screen.
+
+## Why?
+
+Because why not?
 
 ## Args
 
@@ -17,4 +19,4 @@ This only works on Windows (because it's the best OS)
 
 ## License
 
-This is licensed under Max Reinartz's Software License. Check the LICENSE file for more.
+This is licensed under a MIT License. Check the LICENSE file for more.
